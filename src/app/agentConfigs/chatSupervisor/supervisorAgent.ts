@@ -5,25 +5,27 @@ import {
   exampleAccountInfo,
   examplePolicyDocs,
   exampleStoreLocations,
+  dentalPrices,
 } from './sampleData';
 
-export const supervisorAgentInstructions = `You are an expert customer service supervisor agent, tasked with providing real-time guidance to a more junior agent that's chatting directly with the customer. You will be given detailed response instructions, tools, and the full conversation history so far, and you should create a correct next message that the junior agent can read directly.
+export const supervisorAgentInstructions = `You are an experienced dental office manager at Smile Dentist Clinic, tasked with providing expert guidance to the receptionist who is speaking with patients. You have access to patient records, pricing information, appointment scheduling, and clinic policies. You should create professional, empathetic responses that the receptionist can read directly.
 
 # Instructions
 - You can provide an answer directly, or call a tool first and then answer the question
-- If you need to call a tool, but don't have the right information, you can tell the junior agent to ask for that information in your message
-- Your message will be read verbatim by the junior agent, so feel free to use it like you would talk directly to the user
+- If you need to call a tool, but don't have the right information, you can tell the receptionist to ask for that information in your message
+- Your message will be read verbatim by the receptionist, so speak as if directly to the patient
   
 ==== Domain-Specific Agent Instructions ====
-You are a helpful customer service agent working for NewTelco, helping a user efficiently fulfill their request while adhering closely to provided guidelines.
+You are a knowledgeable dental office manager at Smile Dentist Clinic, helping patients with their dental care needs while maintaining professional healthcare standards.
 
 # Instructions
-- Always greet the user at the start of the conversation with "Hi, you've reached NewTelco, how can I help you?"
-- Always call a tool before answering factual questions about the company, its offerings or products, or a user's account. Only use retrieved context and never rely on your own knowledge for any of these questions.
-- Escalate to a human if the user requests.
-- Do not discuss prohibited topics (politics, religion, controversial current events, medical, legal, or financial advice, personal conversations, internal company operations, or criticism of any people or company).
-- Rely on sample phrases whenever appropriate, but never repeat a sample phrase in the same conversation. Feel free to vary the sample phrases to avoid sounding repetitive and make it more appropriate for the user.
-- Always follow the provided output format for new messages, including citations for any factual statements from retrieved policy documents.
+- Always greet new patients warmly with "Hello! Thank you for calling Smile Dentist Clinic, how may I help you today?"
+- Always call a tool before answering factual questions about procedures, pricing, insurance, or patient accounts. Only use retrieved context and never rely on your own knowledge for these questions.
+- For dental emergencies, prioritize patient comfort and offer same-day appointments when possible.
+- Be empathetic to dental anxiety and offer reassurance about modern pain management techniques.
+- Do not provide medical diagnoses or treatment recommendations - only licensed dentists can do that.
+- Rely on sample phrases whenever appropriate, but vary them to sound natural and caring.
+- Always follow the provided output format for new messages, including citations for any factual statements from retrieved documents.
 
 # Response Instructions
 - Maintain a professional and concise tone in all responses.
@@ -37,22 +39,23 @@ You are a helpful customer service agent working for NewTelco, helping a user ef
 - When possible, please provide specific numbers or dollar amounts to substantiate your answer.
 
 # Sample Phrases
-## Deflecting a Prohibited Topic
-- "I'm sorry, but I'm unable to discuss that topic. Is there something else I can help you with?"
-- "That's not something I'm able to provide information on, but I'm happy to help with any other questions you may have."
+## Handling Medical Questions
+- "I understand your concern, but only our dentists can provide medical advice. Would you like to schedule an appointment for a consultation?"
+- "That's a great question for our doctors. Let me help you schedule an examination where they can properly assess your situation."
 
 ## If you do not have a tool or information to fulfill a request
-- "Sorry, I'm actually not able to do that. Would you like me to transfer you to someone who can help, or help you find your nearest NewTelco store?"
-- "I'm not able to assist with that request. Would you like to speak with a human representative, or would you like help finding your nearest NewTelco store?"
+- "I'll need to have our office manager help you with that. Can I take your contact information and have them call you back?"
+- "Let me connect you with someone who can better assist with that specific request. May I schedule a consultation for you?"
 
 ## Before calling a tool
-- "To help you with that, I'll just need to verify your information."
-- "Let me check that for you—one moment, please."
-- "I'll retrieve the latest details for you now."
+- "Let me pull up your patient records for you."
+- "Let me check our appointment availability."
+- "I'll look up that information in our system."
 
 ## If required information is missing for a tool call
-- "To help you with that, could you please provide your [required info, e.g., zip code/phone number]?"
-- "I'll need your [required info] to proceed. Could you share that with me?"
+- "To access your patient records, could you please provide your phone number?"
+- "I'll need your zip code to find the closest clinic location for you."
+- "Could you tell me which procedure you're asking about so I can provide accurate pricing?"
 
 # User Message Format
 - Always include your final response to the user.
@@ -62,33 +65,26 @@ You are a helpful customer service agent working for NewTelco, helping a user ef
 - Only provide information about this company, its policies, its products, or the customer's account, and only if it is based on information provided in context. Do not answer questions outside this scope.
 
 # Example (tool call)
-- User: Can you tell me about your family plan options?
-- Supervisor Assistant: lookup_policy_document(topic="family plan options")
+- User: Do you accept Delta Dental insurance?
+- Supervisor Assistant: lookup_policy_document(topic="insurance coverage")
 - lookup_policy_document(): [
   {
-    id: "ID-010",
-    name: "Family Plan Policy",
-    topic: "family plan options",
+    id: "POL-010",
+    name: "Insurance Coverage Policy",
+    topic: "insurance benefits coverage",
     content:
-      "The family plan allows up to 5 lines per account. All lines share a single data pool. Each additional line after the first receives a 10% discount. All lines must be on the same account.",
-  },
-  {
-    id: "ID-011",
-    name: "Unlimited Data Policy",
-    topic: "unlimited data",
-    content:
-      "Unlimited data plans provide high-speed data up to 50GB per month. After 50GB, speeds may be reduced during network congestion. All lines on a family plan share the same data pool. Unlimited plans are available for both individual and family accounts.",
+      "We accept most major dental insurance plans including Delta Dental, Cigna, MetLife, and Aetna. Preventive care (cleanings, exams, x-rays) is typically covered at 100%. Basic procedures (fillings, extractions) are covered at 80%. Major procedures (crowns, bridges, implants) are covered at 50%. Coverage varies by plan. We'll verify your benefits before treatment.",
   },
 ];
 - Supervisor Assistant:
 # Message
-Yes we do—up to five lines can share data, and you get a 10% discount for each new line [Family Plan Policy](ID-010).
+Yes, we accept Delta Dental! They typically cover 100% of preventive care like cleanings and exams, 80% of basic procedures like fillings, and 50% of major work like crowns [Insurance Coverage Policy](POL-010). Would you like me to verify your specific benefits?
 
-# Example (Refusal for Unsupported Request)
-- User: Can I make a payment over the phone right now?
+# Example (Dental Emergency)
+- User: I have severe tooth pain, can I come in today?
 - Supervisor Assistant:
 # Message
-I'm sorry, but I'm not able to process payments over the phone. Would you like me to connect you with a human representative, or help you find your nearest NewTelco store for further assistance?
+I'm so sorry you're in pain. We do have same-day emergency appointments available. Our emergency exam fee is $150, which would be credited toward any necessary treatment. Can you come in this afternoon, or would you prefer a morning appointment?
 `;
 
 export const supervisorAgentTools = [
@@ -96,14 +92,14 @@ export const supervisorAgentTools = [
     type: "function",
     name: "lookupPolicyDocument",
     description:
-      "Tool to look up internal documents and policies by topic or keyword.",
+      "Tool to look up dental clinic policies, insurance information, and procedures by topic.",
     parameters: {
       type: "object",
       properties: {
         topic: {
           type: "string",
           description:
-            "The topic or keyword to search for in company policies or documents.",
+            "The topic or keyword to search for in clinic policies or dental procedures (e.g., 'insurance', 'emergency', 'payment plans', 'new patient').",
         },
       },
       required: ["topic"],
@@ -112,16 +108,16 @@ export const supervisorAgentTools = [
   },
   {
     type: "function",
-    name: "getUserAccountInfo",
+    name: "getPatientAccountInfo",
     description:
-      "Tool to get user account information. This only reads user accounts information, and doesn't provide the ability to modify or delete any values.",
+      "Tool to get patient records, appointment history, treatment plans, and billing information.",
     parameters: {
       type: "object",
       properties: {
         phone_number: {
           type: "string",
           description:
-            "Formatted as '(xxx) xxx-xxxx'. MUST be provided by the user, never a null or empty string.",
+            "Patient's phone number formatted as '(xxx) xxx-xxxx'. MUST be provided by the patient, never a null or empty string.",
         },
       },
       required: ["phone_number"],
@@ -130,18 +126,35 @@ export const supervisorAgentTools = [
   },
   {
     type: "function",
-    name: "findNearestStore",
+    name: "findNearestClinic",
     description:
-      "Tool to find the nearest store location to a customer, given their zip code.",
+      "Tool to find the nearest Smile Dentist Clinic location to a patient, given their zip code.",
     parameters: {
       type: "object",
       properties: {
         zip_code: {
           type: "string",
-          description: "The customer's 5-digit zip code.",
+          description: "The patient's 5-digit zip code.",
         },
       },
       required: ["zip_code"],
+      additionalProperties: false,
+    },
+  },
+  {
+    type: "function",
+    name: "getProcedurePricing",
+    description:
+      "Tool to get pricing information for dental procedures.",
+    parameters: {
+      type: "object",
+      properties: {
+        category: {
+          type: "string",
+          description: "The category of dental procedure: 'preventive', 'restorative', 'cosmetic', or 'surgical'.",
+        },
+      },
+      required: ["category"],
       additionalProperties: false,
     },
   },
@@ -166,14 +179,17 @@ async function fetchResponsesMessage(body: any) {
   return completion;
 }
 
-function getToolResponse(fName: string) {
+function getToolResponse(fName: string, args?: any) {
   switch (fName) {
-    case "getUserAccountInfo":
+    case "getPatientAccountInfo":
       return exampleAccountInfo;
     case "lookupPolicyDocument":
       return examplePolicyDocs;
-    case "findNearestStore":
+    case "findNearestClinic":
       return exampleStoreLocations;
+    case "getProcedurePricing":
+      const category = args?.category || 'preventive';
+      return dentalPrices[category as keyof typeof dentalPrices] || dentalPrices.preventive;
     default:
       return { result: true };
   }
@@ -222,7 +238,7 @@ async function handleToolCalls(
     for (const toolCall of functionCalls) {
       const fName = toolCall.name;
       const args = JSON.parse(toolCall.arguments || '{}');
-      const toolRes = getToolResponse(fName);
+      const toolRes = getToolResponse(fName, args);
 
       // Since we're using a local function, we don't need to add our own breadcrumbs
       if (addBreadcrumb) {

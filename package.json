@@ -1,6 +1,7 @@
 {
-  "name": "realtime-examples",
-  "version": "0.1.0",
+  "name": "smile-dentist-clinic",
+  "version": "1.0.0",
+  "description": "AI-powered voice assistant for Smile Dentist Clinic - Dental practice management system",
   "private": true,
   "scripts": {
     "dev": "next dev",
